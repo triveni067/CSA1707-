@@ -1,0 +1,42 @@
+% ----------------------------
+% Knowledge Base: Initial Facts
+% ----------------------------
+:- dynamic fact/1.  % Allows us to assert new facts at runtime
+
+fact(rainy).
+fact(have_umbrella).
+
+% ----------------------------
+% Inference Rules
+% ----------------------------
+
+rule(wet_ground) :-
+    fact(rainy).
+
+rule(go_outside) :-
+    fact(have_umbrella),
+    fact(rainy).
+
+rule(stay_home) :-
+    fact(rainy),
+    \+ fact(have_umbrella).
+
+% ----------------------------
+% Forward Chaining Engine
+% ----------------------------
+
+forward_chain :-
+    (rule(NewFact),
+     \+ fact(NewFact),          % Check if we don't already know it
+     assert(fact(NewFact)),     % Add new fact to knowledge base
+     format('Derived new fact: ~w~n', [NewFact]),
+     forward_chain)             % Continue chaining
+    ;                           % Otherwise stop
+    write('No more facts can be derived.'), nl.
+
+% ----------------------------
+% Show All Known Facts
+% ----------------------------
+show_facts :-
+    write('Known facts:'), nl,
+    forall(fact(F), (write('- '), write(F), nl)).
